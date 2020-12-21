@@ -8,7 +8,7 @@ WIP. keyboard firmware for Nordic Semiconductor nRF52840 MCU, specifically the [
 2. Extract the downloaded SDK to `sdk/`, and modify `SDK_PATH` in the `Makefile` accordingly
 3. Install the `arm-none-eabi` toolchain (including **binutils** and **gcc**), from [here](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
 4. Ensure that the downloaded toolchain is either (a) in your `$PATH` (eg. as `arm-none-eabi-gcc`), or modify the variables in the `Makefile` accordingly
-5. Download `adafruit-nrfutil` from [here](https://github.com/adafruit/Adafruit_nRF52_nrfutil) (or install via `pip`
+5. Download `adafruit-nrfutil` from [here](https://github.com/adafruit/Adafruit_nRF52_nrfutil) (or install via `pip`)
 
 The final folder structure should look something like this:
 ```
