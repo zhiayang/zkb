@@ -1,0 +1,8 @@
+*.o
+*.hex
+*.zip
+*.map
+*.out
+sdk/*
+!sdk/overrides
+nrfutil-mac
