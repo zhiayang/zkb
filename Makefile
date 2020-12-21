@@ -8,7 +8,7 @@ SIZE                := arm-none-eabi-size
 OBJCOPY             := arm-none-eabi-objcopy
 NRF_UTIL            := adafruit-nrfutil
 
-DEVICE_PATH         := /dev/cu.usbmodem14201
+DEVICE_PATH         ?= /dev/cu.usbmodem14201
 
 OUTPUT_FOLDER       := build
 OUTPUT_HEX          := $(OUTPUT_FOLDER)/zkb.hex
@@ -28,12 +28,12 @@ KERNEL_SOURCES      := $(shell find kernel/source -iname "*.c" -or -iname "*.cpp
 SDK_HDR_LIBRARIES   := util delay log strerror timer log/src
 
 SDK_LIBRARIES       := memobj balloc strerror atomic delay sortlist atomic_fifo       \
-					   experimental_section_vars ringbuf
+                       experimental_section_vars ringbuf
 
 SDK_COMPONENTS      := boards toolchain/cmsis/include ../external/fprintf
 SDK_INDV_LIB_SRCS   := util/nrf_assert.c util/app_error.c util/app_error_handler_gcc.c      \
-					   util/app_error_weak.c timer/app_timer2.c util/app_util_platform.c    \
-					   hardfault/hardfault_implementation.c atomic_flags/nrf_atflags.c      \
+                       util/app_error_weak.c timer/app_timer2.c util/app_util_platform.c    \
+                       hardfault/hardfault_implementation.c atomic_flags/nrf_atflags.c      \
 
 
 # stuff that is always used:
@@ -66,9 +66,10 @@ ALL_SOURCES         := $(KERNEL_SOURCES) $(SDK_SOURCES) $(MDK_SOURCES)
 ALL_OBJECTS         := $(addsuffix .o,$(ALL_SOURCES))
 
 
-PLATFORM_DEFINES    := -DAPP_TIMER_V2 -DAPP_TIMER_V2_RTC1_ENABLED -DBOARD_PCA10056 \
-					   -DCONFIG_GPIO_AS_PINRESET -DFLOAT_ABI_HARD -DNRF52840_XXAA  \
-					   -DNRF_SD_BLE_API_VERSION=7 -DS140 -DSOFTDEVICE_PRESENT
+PLATFORM_DEFINES    := -DBOARD_NICE_NANO_NRF52840 -DCUSTOM_BOARD_INC=board_nice_nano            \
+                       -DAPP_TIMER_V2 -DAPP_TIMER_V2_RTC1_ENABLED -DBOARD_NICE_NANO_NRF52840    \
+                       -DCONFIG_GPIO_AS_PINRESET -DFLOAT_ABI_HARD -DNRF52840_XXAA               \
+                       -DNRF_SD_BLE_API_VERSION=7 -DS140 -DSOFTDEVICE_PRESENT
 
 PLATFORM_FLAGS      := -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
@@ -94,6 +95,7 @@ $(OUTPUT_ZIP): $(OUTPUT_HEX)
 
 $(OUTPUT_HEX): $(ALL_OBJECTS)
 	@echo "  $(notdir $@)"
+	@mkdir -p build/
 	@$(CC) $(LD_FLAGS) -Wl,-Map=$(@:.hex=.map) -o $@.out $^ $(LIBS)
 	@$(OBJCOPY) -O ihex $@.out $@
 	@$(SIZE) $@
