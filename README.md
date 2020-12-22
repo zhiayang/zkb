@@ -1,6 +1,6 @@
 ## zkb
 
-WIP. keyboard firmware for Nordic Semiconductor nRF52840 MCU, specifically the [nice!nano](https://docs.nicekeyboards.com/#/nice!nano) board.
+WIP. keyboard firmware for Nordic Semiconductor nRF52840 MCU, specifically the [nice!nano](https://docs.nicekeyboards.com/#/nice!nano/) board.
 
 ### setup
 
