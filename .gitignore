@@ -6,3 +6,7 @@
 sdk/*
 !sdk/overrides
 nrfutil-mac
+
+*.c.d
+*.cpp.d
+*.sublime-*
