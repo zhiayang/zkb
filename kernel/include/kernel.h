@@ -8,6 +8,7 @@
 #include <stdint.h>
 
 #include "debug.h"
+#include "matrix.h"
 
 namespace zkb
 {

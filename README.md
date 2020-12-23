@@ -23,10 +23,21 @@ zkb/
 
 ### building
 
-Just `make` will build a hex file, as well as a DFU `.zip` package for flashing in `build/`
+1. Determine the keyboard you are building for; it should be a folder under `keyboards/`.
+2. Run `make keyboard=<keyboard_name>`, eg `make keyboard=lily58`
+
+This will compile the firmware into a hex file, as well as generate a `.zip` package for flashing with `adafruit-nrfutil`.
+
+When switching keyboards (ie. building the firmware for another keyboard), you must run `make clean` first.
 
 ### flashing
 
 1. Place the board into DFU mode (double-tap reset)
 2. Figure out the path to the device (should be somewhere under `/dev/`)
 3. Run `make flash DEVICE_PATH=/dev/path-to-device`
+
+Alternatively, to build and flash simultaneously, you need to explicitly set the name of the keyboard, for example:
+
+```shell
+$ make flash keyboard=lily58 DEVICE_PATH=/dev/cu.usbmodem14201
+```

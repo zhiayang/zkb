@@ -20,6 +20,11 @@ namespace zkb::hal
 		hal_delay_ms(ms);
 	}
 
+	void delayUs(uint32_t us)
+	{
+		hal_delay_us(us);
+	}
+
 	namespace debug
 	{
 		void write(const char* buf, size_t size)

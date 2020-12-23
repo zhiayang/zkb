@@ -19,11 +19,16 @@ extern "C" {
 
 __attribute__((noreturn)) void hal_silent_error(void);
 
+uint64_t hal_pin_read_all(void);
+bool hal_pin_read(uint32_t pin);
 void hal_pin_write(uint32_t pin, bool value);
 void hal_pin_toggle(uint32_t pin);
+void hal_pin_set_output(uint32_t pin);
+void hal_pin_set_input(uint32_t pin, int pull);
 
 void hal_board_init(void);
 void hal_delay_ms(uint32_t ms);
+void hal_delay_us(uint32_t us);
 void hal_debug_write(const char* buf, size_t size);
 
 #if defined(__cplusplus)

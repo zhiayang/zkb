@@ -34,23 +34,45 @@ CXX_FLAGS           := -std=c++17 $(COMMON_FLAGS) $(PLATFORM_FLAGS) $(PLATFORM_D
 LINKER_SCRIPT       := $(PROJECT_ROOT)/sdk/overrides/link.ld
 LD_FLAGS            := -flto $(PLATFORM_FLAGS) -L$(SDK_PATH)/modules/nrfx/mdk -T$(LINKER_SCRIPT) -Wl,--gc-sections --specs=nano.specs
 
-LIBS                := -lc -lnosys -lm
+HAL_LIB             := $(OUTPUT_FOLDER)/hal.a
+KERNEL_LIB          := $(OUTPUT_FOLDER)/kernel.a
 
-HAL_OBJ             := $(OUTPUT_FOLDER)/hal.a
-KERNEL_OBJ          := $(OUTPUT_FOLDER)/kernel.a
+ifneq ($(keyboard),)
+	KEYBOARD = $(keyboard)
+endif
 
-.PHONY: all flash clean kernel hal
+ifneq ($(keymap),)
+	KEYMAP = $(keymap)
+endif
+
+# $(error ...) cannot be indented ):
+ifeq ($(KEYBOARD),)
+$(error keyboard not specified)
+endif
+
+ifeq ($(KEYMAP),)
+$(error keymap not specified)
+endif
+
+ifeq ($(shell find keyboards/ -type d -iname $(KEYBOARD)),)
+$(error keyboard '$(KEYBOARD)' not found)
+endif
+
+
+# disable parallel execution for this top-level makefile
+.NOTPARALLEL:
+.PHONY: all flash clean kernel hal keyboards
+.PHONY: $(ALL_KEYBOARDS)
 .DEFAULT_GOAL = all
 
-all: $(OUTPUT_ZIP)
-hal: $(OUTPUT_FOLDER)/hal.a
-kernel: $(OUTPUT_FOLDER)/kernel.a
-
-$(HAL_OBJ): $(shell find hal -type f)
-	@$(MAKE) -C hal/
-
-$(KERNEL_OBJ): $(shell find kernel -type f)
-	@$(MAKE) -C kernel/
+$(OUTPUT_HEX): $(HAL_LIB) $(KERNEL_LIB)
+	@echo "building keyboard $(KEYBOARD)"
+	@mkdir -p build/
+	@echo "  output: $(notdir $@)"
+	@$(CXX) $(LD_FLAGS) -Wl,-Map=$(@:.hex=.map) -o $@.out -Wl,--start-group $^ -Wl,--end-group -lc -lnosys -lm
+	@$(OBJCOPY) -O ihex $@.out $@
+	@$(SIZE) -G $@.out
+	@rm -f $@.out
 
 $(OUTPUT_ZIP): $(OUTPUT_HEX)
 	@$(NRF_UTIL) --verbose dfu genpkg --dev-type 0x0052 --sd-req 0xFFFE --application $(OUTPUT_HEX) $(OUTPUT_ZIP)
@@ -58,13 +80,17 @@ $(OUTPUT_ZIP): $(OUTPUT_HEX)
 flash: $(OUTPUT_ZIP)
 	@$(NRF_UTIL) --verbose dfu serial -t 1200 --package $(OUTPUT_ZIP) -p $(DEVICE_PATH) -b 115200 --singlebank
 
-$(OUTPUT_HEX): $(HAL_OBJ) $(KERNEL_OBJ)
-	@mkdir -p build/
-	@echo "  output: $(notdir $@)"
-	@$(CXX) $(LD_FLAGS) -Wl,-Map=$(@:.hex=.map) -o $@.out -Wl,--start-group $^ -Wl,--end-group $(LIBS)
-	@$(OBJCOPY) -O ihex $@.out $@
-	@$(SIZE) -G $@.out
-	@rm -f $@.out
+all: $(OUTPUT_ZIP)
+hal: $(OUTPUT_FOLDER)/hal.a
+kernel: $(OUTPUT_FOLDER)/kernel.a
+
+# the HAL and kernel need to be recompiled if any of the things in the
+# keyboard defs change, since they depend on board_config.h and keyboard_config.h
+$(HAL_LIB): $(shell find hal -type f) $(shell find keyboards/$(KEYBOARD) -type f)
+	@$(MAKE) -C hal/
+
+$(KERNEL_LIB): $(shell find kernel -type f) $(shell find keyboards/$(KEYBOARD) -type f)
+	@$(MAKE) -C kernel/
 
 clean:
 	@find sdk -iname "*.o" | xargs rm
@@ -95,3 +121,5 @@ export WARNINGS
 export AS_FLAGS
 export CC_FLAGS
 export CXX_FLAGS
+
+export KEYBOARD

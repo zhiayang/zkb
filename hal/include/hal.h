@@ -14,6 +14,7 @@ namespace zkb::hal
 {
 	void init();
 	void delayMs(uint32_t ms);
+	void delayUs(uint32_t us);
 
 	namespace debug
 	{
