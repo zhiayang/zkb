@@ -17,12 +17,13 @@
 namespace zkb::debug
 {
 	void debug_write_buffered(const char* buf, size_t size);
+	void debug_write_flush_line();
 	void debug_write_flush();
 
 	template <typename... Args>
 	void log(const char* fmt, Args&&... args)
 	{
 		zpr::cprint(&debug_write_buffered, fmt, static_cast<Args&&>(args)...);
-		debug_write_flush();
+		debug_write_flush_line();
 	}
 }

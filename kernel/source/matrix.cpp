@@ -5,22 +5,16 @@
 #include "kernel.h"
 #include "keyboard_config.h"
 
-namespace zkb::matrix
+namespace zkb
 {
 	using namespace keyboard_config;
 
+	static_assert(NUM_ROWS <= 0xFF, "too many rows");
+	static_assert(NUM_COLS <= 0xFF, "too many columns");
+	static_assert(DEBOUNCE_TIME <= 0xFF, "debounce time too long");
 	static_assert(COLUMNS_TO_ROWS, "row-to-column matrices not supported (yet?)");
 
-	static size_t g_debounceIndex = 0;
-	static uint64_t g_debounceBuffer[NUM_ROWS][DEBOUNCE_TIME] = { };
-
-	static bool g_matrixState[NUM_ROWS][NUM_COLS] = { };
-
-	// defined below
-	static void update_row(size_t row, uint64_t pins);
-	static uint64_t debounce_pins(size_t row, uint64_t pins);
-
-	void init()
+	void Matrix::init()
 	{
 		/*
 			how this is configured: there is a diode along each "row" connection, biased "toward" the MCU, and
@@ -38,9 +32,18 @@ namespace zkb::matrix
 			hal::gpio::modeInput(row);
 	}
 
-	void scan()
+	void Matrix::scan()
 	{
-		for(size_t r = 0; r < NUM_ROWS; r++)
+		// reset the flag
+		m_updated = false;
+
+		static constexpr auto MATRIX_SIZE = NUM_ROWS * NUM_COLS * sizeof(bool);
+
+		// make a copy of the old matrix
+		bool old_matrix[NUM_ROWS][NUM_COLS] = { };
+		memcpy(old_matrix, m_matrix, MATRIX_SIZE);
+
+		for(uint8_t r = 0; r < NUM_ROWS; r++)
 		{
 			auto pin_r = ROW_PINS[r];
 			hal::gpio::modeOutput(pin_r);
@@ -48,30 +51,30 @@ namespace zkb::matrix
 
 			// wait a while because "real-world physics"
 			hal::delayUs(1);
+			this->updateRow(r);
 
-			auto all_pins = debounce_pins(r, hal::gpio::readAll());
 			hal::gpio::modeInput(pin_r);
-
-			update_row(r, all_pins);
 		}
 
-		if(++g_debounceIndex > DEBOUNCE_TIME)
-			g_debounceIndex = 0;
+		if(++m_debounceIndex >= DEBOUNCE_TIME)
+			m_debounceIndex = 0;
+
+		// check if we need updating
+		m_updated = (0 != memcmp(old_matrix, m_matrix, MATRIX_SIZE));
 	}
 
-	static void update_row(size_t row, uint64_t pins)
+	bool Matrix::updated()
 	{
-		for(size_t col = 0; col < NUM_COLS; col++)
-		{
-			auto x = (pins >> COL_PINS[col]) & 0x1;
-			g_matrixState[row][col] = x;
-		}
+		return m_updated;
 	}
 
-	static uint64_t debounce_pins(size_t row, uint64_t pins)
+	uint64_t Matrix::debouncePins(uint8_t row)
 	{
-		auto& buffer = g_debounceBuffer[row];
-		buffer[g_debounceIndex] = pins;
+		// note: invert all the bits here, so 1 = pressed, and 0 = released.
+		auto pins = ~hal::gpio::readAll();
+
+		auto& buffer = m_debounceBuffer[row];
+		buffer[m_debounceIndex] = pins;
 
 		// basically, only record the key as released when there has been no contact
 		// for at least DEBOUNCE_TIME iterations. this means that when a switch goes down,
@@ -81,5 +84,21 @@ namespace zkb::matrix
 			ret |= buffer[i];
 
 		return ret;
+	}
+
+	void Matrix::updateRow(uint8_t row)
+	{
+		auto pin_state = this->debouncePins(row);
+
+		for(size_t col = 0; col < NUM_COLS; col++)
+		{
+			auto x = (pin_state >> COL_PINS[col]) & 0x1;
+			m_matrix[row][col] = x;
+
+			if(x)
+			{
+				debug::log("({}, {}) pressed", row, col);
+			}
+		}
 	}
 }

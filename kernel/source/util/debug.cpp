@@ -13,7 +13,7 @@ namespace zkb::debug
 
 	// imagine being thread-safe in 2020
 	static size_t idx = 0;
-	static char global_buffer[BUFFER_SIZE] = { };
+	static char global_buffer[BUFFER_SIZE + 1] = { };
 
 	void debug_write_buffered(const char* buf, size_t size)
 	{
@@ -25,6 +25,13 @@ namespace zkb::debug
 	void debug_write_flush()
 	{
 		hal::debug::write(global_buffer, idx);
+		idx = 0;
+	}
+
+	void debug_write_flush_line()
+	{
+		global_buffer[idx] = '\n';
+		hal::debug::write(global_buffer, idx + 1);
 		idx = 0;
 	}
 }

@@ -23,7 +23,7 @@ zkb/
 
 ### building
 
-1. Determine the keyboard you are building for; it should be a folder under `keyboards/`.
+1. Determine the keyboard you are building for; it should be a folder under `keyboards/`
 2. Run `make keyboard=<keyboard_name>`, eg `make keyboard=lily58`
 
 This will compile the firmware into a hex file, as well as generate a `.zip` package for flashing with `adafruit-nrfutil`.
@@ -41,3 +41,11 @@ Alternatively, to build and flash simultaneously, you need to explicitly set the
 ```shell
 $ make flash keyboard=lily58 DEVICE_PATH=/dev/cu.usbmodem14201
 ```
+
+
+### license
+
+This project is licensed under the Apache License, version 2.0. The Nordic SDK is licensed under the Nordic 5-Clause
+license, but it is not distributed; you must agree to their licensing terms to download the SDK.
+
+No nRF SDK files are distributed with this project.

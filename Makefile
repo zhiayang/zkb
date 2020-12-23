@@ -13,8 +13,6 @@ DEVICE_PATH         ?= /dev/cu.usbmodem14201
 
 PROJECT_ROOT        := $(shell pwd)
 OUTPUT_FOLDER       := $(PROJECT_ROOT)/build
-OUTPUT_HEX          := $(OUTPUT_FOLDER)/zkb.hex
-OUTPUT_ZIP          := $(OUTPUT_HEX:.hex=.zip)
 SDK_PATH            := $(PROJECT_ROOT)/sdk/nrf-sdk-17.0.2
 
 PLATFORM_DEFINES    := -DBOARD_NICE_NANO_NRF52840 -DCUSTOM_BOARD_INC=board_nice_nano            \
@@ -41,22 +39,24 @@ ifneq ($(keyboard),)
 	KEYBOARD = $(keyboard)
 endif
 
-ifneq ($(keymap),)
-	KEYMAP = $(keymap)
+ifneq ($(layout),)
+	LAYOUT = $(layout)
 endif
 
 # $(error ...) cannot be indented ):
-ifeq ($(KEYBOARD),)
-$(error keyboard not specified)
+ifeq ($(LAYOUT),)
+	LAYOUT = default
 endif
 
-ifeq ($(KEYMAP),)
-$(error keymap not specified)
-endif
-
+ifneq ($(KEYBOARD),)
 ifeq ($(shell find keyboards/ -type d -iname $(KEYBOARD)),)
 $(error keyboard '$(KEYBOARD)' not found)
 endif
+endif
+
+# we can only set these after $(KEYBOARD) and $(LAYOUT) have been defined.
+OUTPUT_HEX := $(OUTPUT_FOLDER)/zkb-$(KEYBOARD)-$(LAYOUT).hex
+OUTPUT_ZIP := $(OUTPUT_HEX:.hex=.zip)
 
 
 # disable parallel execution for this top-level makefile
@@ -96,11 +96,11 @@ clean:
 	@find sdk -iname "*.o" | xargs rm
 	@find hal -iname "*.o" | xargs rm
 	@find kernel -iname "*.o" | xargs rm
-	@rm -f build/*.a
-	@rm -f build/*.hex
-	@rm -f build/*.zip
-	@rm -f build/*.map
-	@rm -f build/*.out
+	@rm -f $(OUTPUT_FOLDER)/*.a
+	@rm -f $(OUTPUT_FOLDER)/*.hex
+	@rm -f $(OUTPUT_FOLDER)/*.zip
+	@rm -f $(OUTPUT_FOLDER)/*.map
+	@rm -f $(OUTPUT_FOLDER)/*.out
 
 -include $(ALL_DEPS)
 

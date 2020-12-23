@@ -1,12 +1,17 @@
 # Makefile
 
-SOURCES         := $(shell find source -iname "*.c" -or -iname "*.cpp")
+KEYBOARD_FOLDER := $(PROJECT_ROOT)/keyboards/$(KEYBOARD)
+
+SOURCES         := $(shell find source -iname "*.c" -or -iname "*.cpp") \
+				   $(shell find $(KEYBOARD_FOLDER)/layout/$(LAYOUT) -iname "*.c" -or -iname "*.cpp")
+
 OBJECTS         := $(addsuffix .o,$(SOURCES))
 DEPS            := $(OBJECTS:.o=.d)
 INCLUDES        := -Iinclude                                \
-				   -I$(PROJECT_ROOT)/hal/include/           \
+				   -I$(PROJECT_ROOT)/hal/include            \
 				   -I$(PROJECT_ROOT)/sdk/overrides          \
-				   -I$(PROJECT_ROOT)/keyboards/$(KEYBOARD)
+				   -I$(KEYBOARD_FOLDER)                     \
+				   -I$(KEYBOARD_FOLDER)/layouts/$(LAYOUT)
 
 .PHONY: all
 .DEFAULT_GOAL: all
