@@ -11,8 +11,9 @@ SDK_HDR_LIBRARIES   := util delay log strerror timer log/src usbd/class usbd/cla
 
 SDK_HDR_COMPONENTS  := softdevice/common
 
-SDK_LIBRARIES       := memobj balloc strerror atomic delay sortlist atomic_fifo       \
-					   experimental_section_vars ringbuf usbd usbd/class/cdc/acm
+SDK_LIBRARIES       := memobj balloc strerror atomic delay sortlist atomic_fifo     \
+					   experimental_section_vars ringbuf usbd usbd/class/cdc/acm    \
+					   usbd/class/hid usbd/class/hid/kbd
 
 SDK_COMPONENTS      := boards toolchain/cmsis/include ../external/fprintf ../external/utf_converter
 

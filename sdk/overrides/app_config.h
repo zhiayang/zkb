@@ -9,6 +9,8 @@
 #define NRFX_POWER_ENABLED 1
 
 #define APP_USBD_ENABLED 1
+#define APP_USBD_HID_ENABLED 1
+#define APP_USBD_HID_KBD_ENABLED 1
 #define APP_USBD_CDC_ACM_ENABLED 1
 
 // 0 -- event queue.

@@ -8,6 +8,7 @@
 #include <stdint.h>
 
 #include "hal/usb.h"
+#include "hal/hid.h"
 #include "hal/gpio.h"
 
 namespace zkb::hal

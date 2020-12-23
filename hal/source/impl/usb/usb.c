@@ -11,7 +11,14 @@
 
 // defined in impl/usb/cdc-serial.c
 extern bool hal_usb_debug_init(void);
+
+// defined in impl/usb/hid.c
+extern bool hal_usb_hid_init(void);
+
+// defined below
 static void usb_event_handler(app_usbd_event_type_t event);
+
+
 
 // it doesn't need to be synchronised, just volatile -- since there's ever only 1 reader and 1 writer.
 volatile bool hal_usb_is_available;
@@ -39,6 +46,9 @@ bool hal_usb_init(void)
 		return false;
 
 	if(hal_usb_debug_init() == false)
+		return false;
+
+	if(hal_usb_hid_init() == false)
 		return false;
 
 	ret = app_usbd_power_events_enable();

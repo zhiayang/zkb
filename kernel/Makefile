@@ -3,7 +3,7 @@
 KEYBOARD_FOLDER := $(PROJECT_ROOT)/keyboards/$(KEYBOARD)
 
 SOURCES         := $(shell find source -iname "*.c" -or -iname "*.cpp") \
-				   $(shell find $(KEYBOARD_FOLDER)/layout/$(LAYOUT) -iname "*.c" -or -iname "*.cpp")
+				   $(shell find $(KEYBOARD_FOLDER)/layouts/$(LAYOUT) -iname "*.c" -or -iname "*.cpp")
 
 OBJECTS         := $(addsuffix .o,$(SOURCES))
 DEPS            := $(OBJECTS:.o=.d)

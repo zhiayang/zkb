@@ -31,6 +31,11 @@ void hal_delay_ms(uint32_t ms);
 void hal_delay_us(uint32_t us);
 void hal_debug_write(const char* buf, size_t size);
 
+void hal_usb_hid_key_press(uint8_t keycode);
+void hal_usb_hid_key_release(uint8_t keycode);
+void hal_usb_hid_modifier_press(uint8_t keycode);
+void hal_usb_hid_modifier_release(uint8_t keycode);
+
 #if defined(__cplusplus)
 }
 #endif

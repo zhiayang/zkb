@@ -9,6 +9,7 @@
 
 #include "debug.h"
 #include "matrix.h"
+#include "layout.h"
 
 namespace zkb
 {

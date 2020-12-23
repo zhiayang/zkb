@@ -2,6 +2,8 @@
 // Copyright (c) 2020, zhiayang
 // Licensed under the Apache License Version 2.0.
 
+#include <string.h>
+
 #include "kernel.h"
 #include "keyboard_config.h"
 
@@ -97,7 +99,7 @@ namespace zkb
 
 			if(x)
 			{
-				debug::log("({}, {}) pressed", row, col);
+				// debug::log("({}, {}) pressed", row, col);
 			}
 		}
 	}

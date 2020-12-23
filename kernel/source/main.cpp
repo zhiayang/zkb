@@ -4,10 +4,12 @@
 
 #include "hal.h"
 #include "kernel.h"
+#include "keyboard_config.h"
 
 namespace zkb
 {
 	static Matrix theMatrix;
+	static Layout theLayout;
 
 	void init()
 	{
@@ -19,24 +21,13 @@ namespace zkb
 
 		theMatrix.init();
 
-		int counter = 0;
 		while(true)
 		{
-			debug::log("{} second{} passed", counter, counter == 1 ? " has" : "s have");
-
-			hal::gpio::write(hal::gpio::LED_1, 0);
-			hal::delayMs(250);
-			hal::gpio::write(hal::gpio::LED_1, 1);
-			hal::delayMs(250);
-
 			theMatrix.scan();
+			theLayout.update(theMatrix);
 
-			hal::gpio::write(hal::gpio::LED_1, 0);
-			hal::delayMs(250);
-			hal::gpio::write(hal::gpio::LED_1, 1);
-			hal::delayMs(250);
-
-			counter++;
+			// TODO: probably don't delay
+			hal::delayUs(keyboard_config::MATRIX_SCAN_INTERVAL);
 		}
 	}
 }

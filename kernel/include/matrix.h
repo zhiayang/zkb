@@ -14,6 +14,9 @@ namespace zkb
 		void init();
 		bool updated();
 
+		constexpr uint8_t numRows() const { return keyboard_config::NUM_ROWS; }
+		constexpr uint8_t numColumns() const { return keyboard_config::NUM_COLS; }
+
 	private:
 		void updateRow(uint8_t row);
 		uint64_t debouncePins(uint8_t row);
