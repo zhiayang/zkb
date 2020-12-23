@@ -36,14 +36,9 @@ namespace zkb
 
 	void Matrix::scan()
 	{
-		// reset the flag
-		m_updated = false;
-
-		static constexpr auto MATRIX_SIZE = NUM_ROWS * NUM_COLS * sizeof(bool);
-
-		// make a copy of the old matrix
-		bool old_matrix[NUM_ROWS][NUM_COLS] = { };
-		memcpy(old_matrix, m_matrix, MATRIX_SIZE);
+		// switch the matrix first, so that after a scan, matrices[current] will
+		// have the current state of the matrix, rather than the old state.
+		m_currentMatrix = !m_currentMatrix;
 
 		for(uint8_t r = 0; r < NUM_ROWS; r++)
 		{
@@ -60,15 +55,34 @@ namespace zkb
 
 		if(++m_debounceIndex >= DEBOUNCE_TIME)
 			m_debounceIndex = 0;
-
-		// check if we need updating
-		m_updated = (0 != memcmp(old_matrix, m_matrix, MATRIX_SIZE));
 	}
 
 	bool Matrix::updated()
 	{
-		return m_updated;
+		static constexpr auto MATRIX_SIZE = NUM_ROWS * NUM_COLS * sizeof(bool);
+		return memcmp(m_matrices[0], m_matrices[1], MATRIX_SIZE) != 0;
 	}
+
+	void Matrix::getMatrixDelta(uint8_t (&output)[NUM_ROWS][NUM_COLS])
+	{
+		// m0 is the previous state, m1 is the current state.
+		auto& m0 = m_matrices[!m_currentMatrix];
+		auto& m1 = m_matrices[m_currentMatrix];
+
+		for(size_t r = 0; r < NUM_ROWS; r++)
+		{
+			for(size_t c = 0; c < NUM_COLS; c++)
+			{
+				bool& x0 = m0[r][c];
+				bool& x1 = m1[r][c];
+
+				if(x0 == x1)  output[r][c] = 0;     // no change
+				if(!x0 && x1) output[r][c] = 1;     // pressed
+				if(x0 && !x1) output[r][c] = 2;     // released
+			}
+		}
+	}
+
 
 	uint64_t Matrix::debouncePins(uint8_t row)
 	{
@@ -95,12 +109,9 @@ namespace zkb
 		for(size_t col = 0; col < NUM_COLS; col++)
 		{
 			auto x = (pin_state >> COL_PINS[col]) & 0x1;
-			m_matrix[row][col] = x;
 
-			if(x)
-			{
-				// debug::log("({}, {}) pressed", row, col);
-			}
+			// standard guarantees that true = 1, false = 0 during casting
+			m_matrices[m_currentMatrix][row][col] = x;
 		}
 	}
 }

@@ -43,11 +43,11 @@ ifneq ($(layout),)
 	LAYOUT = $(layout)
 endif
 
-# $(error ...) cannot be indented ):
 ifeq ($(LAYOUT),)
 	LAYOUT = default
 endif
 
+# $(error ...) cannot be indented ):
 ifneq ($(KEYBOARD),)
 ifeq ($(shell find keyboards/ -type d -iname $(KEYBOARD)),)
 $(error keyboard '$(KEYBOARD)' not found)
@@ -122,4 +122,5 @@ export AS_FLAGS
 export CC_FLAGS
 export CXX_FLAGS
 
+export LAYOUT
 export KEYBOARD

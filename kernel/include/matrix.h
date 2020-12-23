@@ -17,14 +17,21 @@ namespace zkb
 		constexpr uint8_t numRows() const { return keyboard_config::NUM_ROWS; }
 		constexpr uint8_t numColumns() const { return keyboard_config::NUM_COLS; }
 
+		// TODO: make an array<> class and return that instead of doing this C-style nonsense?
+		// 0 = no change
+		// 1 = released -> pressed
+		// 2 = pressed -> released
+		void getMatrixDelta(uint8_t (&output)[keyboard_config::NUM_ROWS][keyboard_config::NUM_COLS]);
+
 	private:
 		void updateRow(uint8_t row);
 		uint64_t debouncePins(uint8_t row);
 
-		bool m_updated = false;
 		uint8_t m_debounceIndex = 0;
 		uint64_t m_debounceBuffer[keyboard_config::NUM_ROWS][keyboard_config::DEBOUNCE_TIME] = { };
 
-		bool m_matrix[keyboard_config::NUM_ROWS][keyboard_config::NUM_COLS] = { };
+		// double buffering OMEGALUL
+		int m_currentMatrix = 0;
+		bool m_matrices[2][keyboard_config::NUM_ROWS][keyboard_config::NUM_COLS] = { };
 	};
 }

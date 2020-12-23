@@ -6,7 +6,8 @@
 
 #include <stdint.h>
 
-namespace keys
+// namespace keys
+namespace
 {
 	static constexpr uint8_t M_NONE         = 0x00;
 	static constexpr uint8_t M_LCTRL        = 0x01;
@@ -75,7 +76,7 @@ namespace keys
 	static constexpr uint16_t K_APOSTROPHE  = 0x34;
 	static constexpr uint16_t K_GRAVE       = 0x35;
 	static constexpr uint16_t K_COMMA       = 0x36;
-	static constexpr uint16_t K_DOT         = 0x37;
+	static constexpr uint16_t K_PERIOD      = 0x37;
 	static constexpr uint16_t K_SLASH       = 0x38;
 	static constexpr uint16_t K_CAPSLOCK    = 0x39;
 
