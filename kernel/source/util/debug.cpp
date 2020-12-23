@@ -17,9 +17,9 @@ namespace zkb::debug
 
 	void debug_write_buffered(const char* buf, size_t size)
 	{
-		auto todo = (BUFFER_SIZE - idx > size ? size : BUFFER_SIZE - idx - 1);
-		memcpy(global_buffer + idx, buf, todo);
-		idx += todo;
+		auto num = (BUFFER_SIZE - idx > size ? size : BUFFER_SIZE - idx - 1);
+		memcpy(global_buffer + idx, buf, num);
+		idx += num;
 	}
 
 	void debug_write_flush()
