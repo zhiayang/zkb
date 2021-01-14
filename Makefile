@@ -9,7 +9,7 @@ SIZE                := arm-none-eabi-size
 OBJCOPY             := arm-none-eabi-objcopy
 NRF_UTIL            := adafruit-nrfutil
 
-DEVICE_PATH         ?= /dev/cu.usbmodem14201
+DEVICE_PATH         ?= /dev/cu.usbmodem14101
 
 PROJECT_ROOT        := $(shell pwd)
 OUTPUT_FOLDER       := $(PROJECT_ROOT)/build
@@ -78,7 +78,7 @@ $(OUTPUT_ZIP): $(OUTPUT_HEX)
 	@$(NRF_UTIL) --verbose dfu genpkg --dev-type 0x0052 --sd-req 0xFFFE --application $(OUTPUT_HEX) $(OUTPUT_ZIP)
 
 flash: $(OUTPUT_ZIP)
-	@$(NRF_UTIL) --verbose dfu serial -t 1200 --package $(OUTPUT_ZIP) -p $(DEVICE_PATH) -b 115200 --singlebank
+	@$(NRF_UTIL) --verbose dfu serial -t 1200 --package $(OUTPUT_ZIP) -p $(DEVICE_PATH) -b 38400 --singlebank
 
 all: $(OUTPUT_ZIP)
 hal: $(OUTPUT_FOLDER)/hal.a
